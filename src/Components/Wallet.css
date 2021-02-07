@@ -1,0 +1,16 @@
+.connect-button {
+  margin-top: 50vh;
+  width: 20vw;
+  height: 60px;
+  border-radius: 30px;
+  background: #292929;
+  transition: all 0.2s;
+  cursor: pointer;
+  color: white;
+}
+
+.connect-button:hover {
+  height: 70px;
+  width: 23vw;
+  border: 3px solid;
+}

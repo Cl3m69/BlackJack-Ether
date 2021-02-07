@@ -1,20 +1,12 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Web3ReactProvider } from "@web3-react/core";
 import { Web3Provider } from "@ethersproject/providers";
 import { useWeb3React } from "@web3-react/core";
 import { InjectedConnector } from "@web3-react/injected-connector";
-import useSWR from "swr";
+import useSWR, { mutate } from "swr";
 import { formatEther } from "@ethersproject/units";
-
-export const injectedConnector = new InjectedConnector({
-  supportedChainIds: [
-    1, // Mainet
-    3, // Ropsten
-    4, // Rinkeby
-    5, // Goerli
-    42, // Kovan
-  ],
-});
+import Home from "./Components/Home";
+import { Wallet } from "./Components/Wallet";
 
 function getLibrary(provider) {
   const library = new Web3Provider(provider);
@@ -22,54 +14,10 @@ function getLibrary(provider) {
   return library;
 }
 
-const fetcher = (library) => (...args) => {
-  const [method, ...params] = args;
-  console.log(method, params);
-  return library[method](...params);
-};
-
-export const Balance = () => {
-  const { account, library } = useWeb3React();
-  const { data: balance } = useSWR(["getBalance", account, "latest"], {
-    fetcher: fetcher(library),
-  });
-  if (!balance) {
-    return <div>...</div>;
-  }
-  return <div>Balance: {parseFloat(formatEther(balance)).toPrecision(4)}</div>;
-};
-
-export const Wallet = () => {
-  const { chainId, account, activate, active } = useWeb3React();
-  const { data: balance } = useSWR(["getBalance", account, "latest"]);
-
-  const onClick = () => {
-    activate(injectedConnector);
-  };
-
-  return (
-    <div>
-      <div>ChainId: {chainId}</div>
-      <div>Account: {account}</div>
-
-      {active ? (
-        <>
-          <div>✅ </div>
-          <Balance></Balance>
-        </>
-      ) : (
-        <button type="button" onClick={onClick}>
-          Connect
-        </button>
-      )}
-    </div>
-  );
-};
-
 const App = () => {
   return (
     <Web3ReactProvider getLibrary={getLibrary}>
-      <Wallet />
+      <Home></Home>
     </Web3ReactProvider>
   );
 };
