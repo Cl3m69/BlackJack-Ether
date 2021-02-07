@@ -4,6 +4,7 @@ import { Web3Provider } from "@ethersproject/providers";
 import { useWeb3React } from "@web3-react/core";
 import { InjectedConnector } from "@web3-react/injected-connector";
 import useSWR from "swr";
+import { formatEther } from "@ethersproject/units";
 
 export const injectedConnector = new InjectedConnector({
   supportedChainIds: [
@@ -35,7 +36,7 @@ export const Balance = () => {
   if (!balance) {
     return <div>...</div>;
   }
-  return <div>Balance: {balance.toString()}</div>;
+  return <div>Balance: {parseFloat(formatEther(balance)).toPrecision(4)}</div>;
 };
 
 export const Wallet = () => {
