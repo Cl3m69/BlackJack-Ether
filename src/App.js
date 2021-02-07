@@ -3,6 +3,7 @@ import { Web3ReactProvider } from "@web3-react/core";
 import { Web3Provider } from "@ethersproject/providers";
 import { useWeb3React } from "@web3-react/core";
 import { InjectedConnector } from "@web3-react/injected-connector";
+import useSWR from "swr";
 
 export const injectedConnector = new InjectedConnector({
   supportedChainIds: [
@@ -20,8 +21,26 @@ function getLibrary(provider) {
   return library;
 }
 
+const fetcher = (library) => (...args) => {
+  const [method, ...params] = args;
+  console.log(method, params);
+  return library[method](...params);
+};
+
+export const Balance = () => {
+  const { account, library } = useWeb3React();
+  const { data: balance } = useSWR(["getBalance", account, "latest"], {
+    fetcher: fetcher(library),
+  });
+  if (!balance) {
+    return <div>...</div>;
+  }
+  return <div>Balance: {balance.toString()}</div>;
+};
+
 export const Wallet = () => {
   const { chainId, account, activate, active } = useWeb3React();
+  const { data: balance } = useSWR(["getBalance", account, "latest"]);
 
   const onClick = () => {
     activate(injectedConnector);
@@ -31,8 +50,12 @@ export const Wallet = () => {
     <div>
       <div>ChainId: {chainId}</div>
       <div>Account: {account}</div>
+
       {active ? (
-        <div>✅ </div>
+        <>
+          <div>✅ </div>
+          <Balance></Balance>
+        </>
       ) : (
         <button type="button" onClick={onClick}>
           Connect
